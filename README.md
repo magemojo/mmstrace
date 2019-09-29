@@ -5,7 +5,7 @@ Good for finding the reason for a slow page or non-admin page that is giving an 
 
 Must be in Magento root ( pub folder for M2.1 or 2.2 template)
 
-git clone https://github.com/magemojo/mmstrace; tar -xvzf mmstrace.tar.gz;chmod u+x mmstrace.py;./mmstrace.py
+git clone https://github.com/magemojo/mmstrace; chmod u+x mmstrace.py;./mmstrace.py
 
 9/29/2019 changed slow query and path list to 10 instead of 5. Added top tables accessed and count.
 
