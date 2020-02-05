@@ -122,11 +122,11 @@ xmp{
         <div class="panel panel-default">
            <div class="panel-heading">
            <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
                   TOP 10 slowest queries</a>
                   </h4>
            </div>
-           <div id="collapse5" class="panel-collapse collapse">
+           <div id="collapse4" class="panel-collapse collapse">
                   <div class="panel-body">
 
                   <?php
@@ -145,13 +145,14 @@ xmp{
         <div class="panel panel-default">
            <div class="panel-heading">
            <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse5">
                   Query info</a>
                   </h4>
            </div>
-           <div id="collapse6" class="panel-collapse collapse">
+           <div id="collapse5" class="panel-collapse collapse">
                   <div class="panel-body">
                   Table mentions and count: possibly good for finding loops<BR>
+
                   <?php
                   $sarray = file("query_info");
                   $reversed = array_reverse($sarray);
@@ -163,16 +164,39 @@ xmp{
                   </div>
            </div>
         </div>
-        
+
+        <!-- REDIS ACTIVITY -->
+        <div class="panel panel-default">
+           <div class="panel-heading">
+           <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse6">
+                  Redis activity</a>
+                  </h4>
+           </div>
+           <div id="collapse6" class="panel-collapse collapse">
+                  <div class="panel-body">
+                  GREP for HMSET|HGET|HSET|HMGET|EXPIRE|redis<BR>
+                  <xmp>
+                <?php
+                  $sarray = file("redis.out");
+                  foreach ( $sarray as $aquery ) {
+                            echo $aquery;
+                  }
+                  ?>
+                  </xmp>
+                  </div>
+           </div>
+        </div>
+
         <!-- RAW STRACE OUTPUT -->
         <div class="panel panel-default">
            <div class="panel-heading">
            <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse4">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#collapse7">
                   RAW strace output</a>
            </h4>
            </div>
-           <div id="collapse4" class="panel-collapse collapse">
+           <div id="collapse7" class="panel-collapse collapse">
                   <div class="panel-body">
                   <xmp>
                   <?php
@@ -190,4 +214,3 @@ xmp{
         </body>
 
 </html>
-
