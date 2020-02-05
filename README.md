@@ -5,7 +5,8 @@ Good for finding the reason for a slow page or non-admin page that is giving an 
 
 Must be in Magento root ( pub folder for M2.1 or 2.2 template)
 
-git clone https://github.com/magemojo/mmstrace;mv mmstrace mmdl;cd mmdl; mv mmstrace* ../;cd ..;chmod u+x mmstrace.py;./mmstrace.py
+wget https://github.com/magemojo/mmstrace/raw/master/mmstrace.tar.gz;tar -xvzf mmstrace.tar.gz;chmod u+x mmstrace.py;./mmstrace.py
 
+2/5/2020 Removed MHM section. Added query string usage & Redis activity. Added core_session and core_cache usage detection. 
 9/29/2019 changed slow query and path list to 10 instead of 5. Added top tables accessed and count.
 
