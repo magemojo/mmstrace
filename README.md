@@ -1,5 +1,5 @@
 # mmstrace
-Jackie Agnus
+Jackie Angus
 strace script for Magento on stratus
 
 Good for finding the reason for a slow page or non-admin page that is giving an error. Just paste in the url of the page you want to strace. Remove this script once testing is complete.
