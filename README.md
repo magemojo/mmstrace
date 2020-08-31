@@ -10,3 +10,5 @@ wget https://github.com/magemojo/mmstrace/raw/master/mmstrace.tar.gz;tar -xvzf m
 2/5/2020 Removed MHM section. Added query string usage & Redis activity. Added core_session and core_cache usage detection. 
 9/29/2019 changed slow query and path list to 10 instead of 5. Added top tables accessed and count.
 
+# blackflip.sh
+Backflip v3.3 is now available. This version eliminates the need for Magento version checking and pulls MySQL data straight from Stratus courtesy of Ian, and features store-friendly nice MySQL dumps for almost zero POC hits.
