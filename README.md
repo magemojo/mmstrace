@@ -31,6 +31,7 @@ Jackie Angus
 
 Autoblocks IPs from carding attacks as a cron. Could also change the sed variable to match a different attack pattern from nginx logs. Will not work at other hosts. 
 Download to /srv/mmautoban/
+wget https://github.com/magemojo/mmstrace/raw/master/mmautoban.py
 create nginx config file: touch /srv/.nginx/server_level/mmautoban.conf
 Set cron to run every 5min: /usr/bin/python /srv/mmautoban/mmautoban.py >> /srv/mmautoban/mmautoban.log
 
