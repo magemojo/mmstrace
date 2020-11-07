@@ -5,7 +5,6 @@
 
 #variables
 nginxfile = "/srv/.nginx/server_level/mmautoban.conf"
-#nginxfile = "/srv/mmautoban/mmautoban.conf"
 
 # Needed things
 import datetime
@@ -30,7 +29,6 @@ f = fiveago.strftime("%d\/%b\/%Y:%H:%M:00")
 
 # check log for past 5min
 sed = "sed -rne '/" + f + "/,/" + n + "/ p' /log/access.log | grep rest/default/V1/guest-carts | grep payment-information
-#sed = "sed -rne '/" + f + "/,/" + n + "/ p' /log/access.log > /srv/mmautoban/found.log"
 #print(sed)
 os.system(sed)
 
