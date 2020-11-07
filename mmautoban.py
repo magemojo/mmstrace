@@ -5,6 +5,7 @@
 
 #variables
 nginxfile = "/srv/.nginx/server_level/mmautoban.conf"
+#nginxfile = "/srv/mmautoban/mmautoban.conf"
 
 # Needed things
 import datetime
@@ -13,7 +14,7 @@ import subprocess
 
 # Get Current Date/Time
 getnow = datetime.datetime.now()
-now = getnow.strftime("%d/%b/%Y:%k:%M")
+now = getnow.strftime("%d/%b/%Y:%H:%M")
 now = datetime.datetime.strptime(now, '%d/%b/%Y:%H:%M')
 #print(now)
 
@@ -22,13 +23,14 @@ fiveago = now + datetime.timedelta(minutes = -5)
 #print(fiveago)
 
 #convert to right format
-n = now.strftime("%d\/%b\/%Y:%k:%M:59")
-f = fiveago.strftime("%d\/%b\/%Y:%k:%M:00")
+n = now.strftime("%d\/%b\/%Y:%H:%M:59")
+f = fiveago.strftime("%d\/%b\/%Y:%H:%M:00")
 #print(n)
 #print(f)
 
 # check log for past 5min
-sed = "sed -rne '/" + f + "/,/" + n + "/ p' /log/access.log | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > /srv/mmautoban/found.log"
+sed = "sed -rne '/" + f + "/,/" + n + "/ p' /log/access.log | grep rest/default/V1/guest-carts | grep payment-information
+#sed = "sed -rne '/" + f + "/,/" + n + "/ p' /log/access.log > /srv/mmautoban/found.log"
 #print(sed)
 os.system(sed)
 
@@ -51,7 +53,8 @@ else:
 
             # deny in nginx if not already there
             with open(nginxfile) as nfile:
-                if line in nfile.read():
+                linetest = line + ";"
+                if linetest in nfile.read():
                     print(n + " " + line + " already added to blocks")
                 else:
                     ban = "echo 'deny " + line + ";' >> " + nginxfile
