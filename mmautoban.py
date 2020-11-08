@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
 # Auto-add IPs related to carding attacks
-# Cron should be set to (time-1)
+# Cron should be set to every 1min
 
 
 ########## NEEDED THINGS ##########
@@ -38,9 +38,6 @@ mmpath = "/srv/mmautoban/"
 
 # How many minutes ago of logfile should we check
 time = -2
-
-# How many minutes ago to check access logs for static asset hit
-timestatic = -10
 
 
 ########## GET TIME VARS ##########
