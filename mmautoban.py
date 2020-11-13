@@ -177,12 +177,18 @@ if reload == 1:
 # Attacks today
 attackssofar = os.popen("grep payment-information " + logfile + " | grep -e ' 403 ' -e ' 400 ' | grep POST | wc -l").read().replace("\n", "")
 blocksuccess = os.popen("grep payment-information " + logfile + " | grep ' 403 ' | grep POST | wc -l").read().replace("\n", "")
-ratiotoday = round(float(int(blocksuccess))/float(int(attackssofar)) * 100,2)
+if int(attackssofar) > 0:
+    ratiotoday = round(float(int(blocksuccess))/float(int(attackssofar)) * 100,2)
+else:
+    ratiotoday = 0
 
 # Attacks yesterday
 attacksyester = os.popen("grep payment-information " + logfile2 + " | grep -e ' 403 ' -e ' 400 ' | grep POST | wc -l").read().replace("\n", "")
 blocksuccess2 = os.popen("grep payment-information " + logfile2 + " | grep ' 403 ' | grep POST | wc -l").read().replace("\n", "")
-ratioyester = round(float(int(blocksuccess2))/float(int(attacksyester)) * 100,2)
+if int(attacksyester) > 0:
+    ratioyester = round(float(int(blocksuccess2))/float(int(attacksyester)) * 100,2)
+else:
+    ratioyester = 0
 
 # Total lifetime blocked IPs and carts
 blockedips = os.popen("cat " + nginxfile + " | wc -l").read().replace("\n", "")
