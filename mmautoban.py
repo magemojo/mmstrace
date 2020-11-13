@@ -126,9 +126,12 @@ else:
                 hits = int(hits)
                 if hits > 100:
                     #ban it
-                    print(n + " " + PINK + line + NC + " Blocking for addcart count " + str(hits))
-                    doban(line)
-                    reload = 1
+                    if 66.249 in line:
+                        print(n + RED + " Can't block " + PINK + LINE + RED + ". Google Bot." + NC)
+                    else:
+                        print(n + " " + PINK + line + NC + " Blocking for addcart count " + str(hits))
+                        doban(line)
+                        reload = 1
                 else:
                     print(n + " " + PINK + line + GREEN + " Addcart appears legit" + NC)
 
