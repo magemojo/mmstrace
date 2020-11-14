@@ -35,7 +35,8 @@ Download to /srv/mmautoban/
 
 wget https://github.com/magemojo/mmstrace/raw/master/mmautoban.py
 
-create nginx config files: touch /srv/.nginx/server_level/mmautoban.conf;touch /srv/.nginx/server_level/mmautobancarts.conf
+create nginx config files: touch /srv/.nginx/server_level/mmautoban.conf
+touch /srv/.nginx/server_level/mmautobancarts.conf
 
 Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py >> /srv/mmautoban/mmautoban.log
 
