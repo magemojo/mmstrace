@@ -29,7 +29,7 @@ DNS quick-script to show WHOIS info, DNS records, mail records, DKIM, SSL info.
 
 Jackie Angus
 
-Autoblocks IPs & carts from carding attacks as a cron. Could also change the sed variable to match a different attack pattern from nginx logs. Will not work at other hosts. 
+Autoblocks IPs & carts from carding attacks and/or TOR exit nodes as a crondepending on options you choose. Will not work at other hosts. 
 
 Download to /srv/mmautoban/
 
@@ -38,10 +38,12 @@ wget https://github.com/magemojo/mmstrace/raw/master/mmautoban.py
 create nginx config files: 
 touch /srv/.nginx/server_level/mmautoban.conf
 touch /srv/.nginx/server_level/mmautobancarts.conf
+touch /srv/.nginx/server_level/mmautobantor.conf
 
-Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py >> /srv/mmautoban/mmautoban.log
+For carding attack blocking: Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py --carding >> /srv/mmautoban/mmautoban.log
+For TOR exit node blocking: Set cron to run once a day to check for updates: /usr/bin/python /srv/mmautoban/mmautoban.py --torexits >> /srv/mmautoban/mmautobanTOR.log
 
-Logs/stats will be in /srv/mmautoban/mmautoban.log
+Logs/stats will be in /srv/mmautoban/mmautoban.log or mmautobanTOR.log accordingly.
 
 
 # magento-mirror-1.9.4.5.tar.gz
