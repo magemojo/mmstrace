@@ -41,6 +41,9 @@ touch /srv/.nginx/server_level/mmautobancarts.conf
 touch /srv/.nginx/server_level/mmautobantor.conf
 
 For carding attack blocking: Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py --carding >> /srv/mmautoban/mmautoban.log
+
+To unban IPs & carts, set separate cron to run every 2hrs: /usr/bin/python /srv/mmautoban/mmautoban.py --unban >> /srv/mmautoban/mmautoban.log
+
 For TOR exit node blocking: Set cron to run once a day to check for updates: /usr/bin/python /srv/mmautoban/mmautoban.py --torexits >> /srv/mmautoban/mmautobanTOR.log
 
 Logs/stats will be in /srv/mmautoban/mmautoban.log or mmautobanTOR.log accordingly.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
-# v1.3
+# v1.4
 # Auto-add IPs related to carding attacks
 # Cron should be set to (time-1)
 
@@ -34,6 +34,12 @@ mmpath = "/srv/mmautoban/"
 # How many minutes ago of logfile should we check
 time = -2
 
+# How many minutes ago should we check for attacks before unbanning?
+utime = -15
+
+# How many attacks should be considered "an active attack" in utime above
+activelimit = 10
+
 # Some Pretty Colors for logs
 NC='\033[0m' # No Color
 RED='\033[0;31m'
@@ -57,10 +63,12 @@ now = datetime.datetime.strptime(now, '%d/%b/%Y:%H:%M')
 
 # get exact time for "var time set" and "var timestatic set" minutes ago
 ago = now + datetime.timedelta(minutes = time)
+uago = now + datetime.timedelta(minutes = utime)
 
 #convert to right format to use as string for search
 n = now.strftime("%d\/%b\/%Y:%H:%M")
 f = ago.strftime("%d\/%b\/%Y:%H:%M")
+u = uago.strftime("%d\/%b\/%Y:%H:%M")
 
 
 ######### GLOBAL ARGUMENT MAGIC AKA WHAT ARE WE DOING? ##########
@@ -69,6 +77,8 @@ parser.add_argument('-c', '--carding', action='store_true',
     help="blocks carding attacks")
 parser.add_argument('-t', '--torexits', action='store_true',
     help="blocks tor exits")
+parser.add_argument('-u', '--unban', action='store_true',
+    help="unbans IPs & carts unless attack is active")
 args = parser.parse_args()
 
 
@@ -162,7 +172,9 @@ if args.carding:
                     if hits > 100:
                         #ban it
                         if 66.249 in line:
-                            print(n + RED + " Can't block " + PINK + LINE + RED + ". Google Bot." + NC)
+                            print(n + RED + " Can't block for cartadd " + PINK + LINE + RED + ". Google Bot." + NC)
+                        #elif "127.0.0.1" in line:
+                            #print(n + RED + " Can't block for cartadd " + PINK + LINE + RED + ". OtherWhitelisted IP." + NC)
                         else:
                             print(n + " " + PINK + line + NC + " Blocking for addcart count " + str(hits))
                             doban(line,nginxfile)
@@ -220,13 +232,13 @@ if args.carding:
         ratioyester = 0
 
     # Total lifetime blocked IPs and carts
-    blockedips = os.popen("cat " + nginxfile + " | wc -l").read().replace("\n", "")
-    blockedcarts = os.popen("cat " + nginxfilecarts + " | wc -l").read().replace("\n", "")
+    blockedips = os.popen("cat " + mmpath + "totalbanned.log | wc -l").read().replace("\n", "")
+    #blockedcarts = os.popen("cat " + nginxfilecarts + " | wc -l").read().replace("\n", "")
 
     print(n + " Successfully blocked! TODAY: " + YELLOW + str(blocksuccess) + " requests / " + str(attackssofar) + " attacks = " + RED + str(ratiotoday) + "%" + NC)
     print(n + " Successfully blocked! YESTERDAY: " + YELLOW + str(blocksuccess2) + " requests / " + str(attacksyester) + " attacks = " + RED + str(ratioyester) + "%" + NC)
     print(n + YELLOW + " IPs blocked lifetime: " + RED + str(blockedips) + NC)
-    print(n + YELLOW + " Carts blocked lifetime: " + RED + str(blockedcarts) + NC)
+    #print(n + YELLOW + " Carts blocked lifetime: " + RED + str(blockedcarts) + NC)
     print(BLUE + "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" + NC)
 
 
@@ -247,6 +259,26 @@ if args.torexits:
             for line in reversed(contents):
                 line = line.replace("\n", "")
                 doban(line,nginxtor)
+
+
+######### --unban -u UNBANS IPs & Carts previosuly banned unless attack is underway now ###########
+if args.unban:
+    # Check if attack is active
+    checkattacks1 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "unbancheck.log"
+    checkattacks2 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 403 '>> " + mmpath + "unbancheck.log"
+    os.system(checkattacks1)
+    os.system(checkattacks2)
+    count = os.popen("cat " + mmpath + "unbancheck.log | wc -l").read().replace("\n", "")
+    if int(count) > activelimit:
+        print(n + " " + RED + str(count) + " attacks logged in past " + str(abs(utime)) + " minutes. Skipping unbans." + NC)
+    else:
+        print(n + " " + GREEN + "Unbanning IPs & carts since only " + str(count) + " attacks logged in past " + str(abs(utime)) + " minutes." + NC)
+        unbanips = "cat " + nginxfile + " >> " + mmpath + "totalbanned.log;echo '# Cleared at " + n + "' > " + nginxfile
+        unbancarts = "echo '# Cleared at " + n + "' > " + nginxfilecarts
+        os.system(unbanips)
+        os.system(unbancarts)
+        global reload
+        reload =1
 
 ######### GLOBAL RELOAD NGINX NICELY IF WE ADDED BLOCKS ##########
 if reload == 1:
