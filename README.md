@@ -29,24 +29,34 @@ DNS quick-script to show WHOIS info, DNS records, mail records, DKIM, SSL info.
 
 Jackie Angus
 
-Autoblocks IPs & carts from carding attacks and/or TOR exit nodes as a crondepending on options you choose. Will not work at other hosts. 
+Autoblocks IPs & carts from carding attacks and/or TOR exit nodes as a cron depending on options you choose. Will not work at other hosts. 
 
 Download to /srv/mmautoban/
 
 wget https://github.com/magemojo/mmstrace/raw/master/mmautoban.py
 
-create nginx config files: 
-touch /srv/.nginx/server_level/mmautoban.conf
-touch /srv/.nginx/server_level/mmautobancarts.conf
-touch /srv/.nginx/server_level/mmautobantor.conf
-
-For carding attack blocking: Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py --carding >> /srv/mmautoban/mmautoban.log
+For carding attack blocking: Set cron to run every 1min: /usr/bin/python /srv/mmautoban/mmautoban.py --carding 3 >> /srv/mmautoban/mmautoban.log
 
 To unban IPs & carts, set separate cron to run every 2hrs: /usr/bin/python /srv/mmautoban/mmautoban.py --unban >> /srv/mmautoban/mmautoban.log
 
 For TOR exit node blocking: Set cron to run once a day to check for updates: /usr/bin/python /srv/mmautoban/mmautoban.py --torexits >> /srv/mmautoban/mmautobanTOR.log
 
-Logs/stats will be in /srv/mmautoban/mmautoban.log or mmautobanTOR.log accordingly.
+Option: --carding <NUM>
+For carding attacks to payment-information API URL: 
+<NUM> is the number of times an IP or cart can return a 400 before being banned. 
+1 is very aggressive and should be used only when under active attack by several different ranges of IPs. This is because a legit customer can also receive a 400 error when a card is denied, or they enter the wrong zipcode.  
+Set cron every 1min example: /usr/bin/python /srv/mmautoban/mmautoban.py --carding 3 >> /srv/mmautoban/mmautoban.log
+Logs/stats will be in /srv/mmautoban/mmautoban.log
+
+Option: --unban
+To unban previously banned carts/IPs unless the store is currently under attack. 
+Set cron every 2hrs: /usr/bin/python /srv/mmautoban/mmautoban.py --unban >> /srv/mmautoban/mmautoban.log
+Logs for unban will be in /srv/mmautoban/mmautoban.log
+
+Option: --torexits
+Blocks TOR exit nodes and keeps the list up to date via cron
+Set cron to once a day: /usr/bin/python /srv/mmautoban/mmautoban.py --torexits >> /srv/mmautoban/mmautoban.log
+Logs for TOR will be in /srv/mmautoban/mmautobanTOR.log
 
 
 # magento-mirror-1.9.4.5.tar.gz
