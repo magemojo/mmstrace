@@ -175,7 +175,7 @@ if args.carding >= 1:
     os.system(checkcart)
 
     # Check logs for payment API with 400 response
-    checkapi = "sed -rne '/" + f + "/,/" + n + "/ p' " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "foundapi.log"
+    checkapi = "sed -rne '/" + f + "/,/" + n + "/ p' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "foundapi.log"
     #checkapi = "cat " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "foundapi.log"
     os.system(checkapi)
 
@@ -321,8 +321,8 @@ if args.torexits:
 ######### --unban -u UNBANS IPs & Carts previosuly banned unless attack is underway now ###########
 if args.unban:
     # Check if attack is active
-    checkattacks1 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "unbancheck.log"
-    checkattacks2 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 403 '>> " + mmpath + "unbancheck.log"
+    checkattacks1 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "unbancheck.log"
+    checkattacks2 = "sed -rne '/" + u + "/,/" + n + "/ p' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 403 '>> " + mmpath + "unbancheck.log"
     os.system(checkattacks1)
     os.system(checkattacks2)
     count = os.popen("cat " + mmpath + "unbancheck.log | wc -l").read().replace("\n", "")
