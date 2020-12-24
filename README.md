@@ -58,6 +58,15 @@ Blocks TOR exit nodes and keeps the list up to date via cron
 Set cron to once a day: /usr/bin/python /srv/mmautoban/mmautoban.py --torexits >> /srv/mmautoban/mmautoban.log
 Logs for TOR will be in /srv/mmautoban/mmautobanTOR.log
 
+Option: --custom -l -m -r
+Choose any path to monitor for excessive POSTS
+-l <limit> = the max number of POSTS allowed to the path before an IP is banned
+-m <minutes> = time frame in minutes to count the POSTS above
+-r <refresh> = how often should we refresh everything and unban IPs (in minutes)
+Set cron to every 1 min
+Example: This cron will block an IP if it posts to myadminpath/ more than 10 times in 60 minutes. It will refresh confs/unban those IPs every 120 minutes. ( unless the site is currently under attack )
+/usr/bin/python /srv/mmautoban/mmautoban.py --custompath myadminpath/ -l 10 -m 60 -r 120 >> /srv/mmautoban/mmautoban.log
+
 
 # magento-mirror-1.9.4.5.tar.gz
 
