@@ -63,7 +63,7 @@ Choose any path to monitor for excessive POSTS
 -l <limit> = the max number of POSTS allowed to the path before an IP is banned
 -m <minutes> = time frame in minutes to count the POSTS above
 -r <refresh> = how often should we refresh everything and unban IPs (in minutes)
-Set cron to every 1 min. 
+Set cron to every 1 min
 Example: This cron will block an IP if it posts to myadminpath/ more than 10 times in 60 minutes. It will refresh confs/unban those IPs every 120 minutes. ( unless the site is currently under attack )
 /usr/bin/python /srv/mmautoban/mmautoban.py --custompath myadminpath/ -l 10 -m 60 -r 120 >> /srv/mmautoban/mmautoban.log
 
