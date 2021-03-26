@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
-# v1.7
+# v1.8
 # Auto-add IPs related to carding attacks / TOR / custom paths
 # Cron should be set to same time as <time> variable for carding (default is 1 minute)
 
@@ -21,6 +21,7 @@ logfile = "/log/access.log"
 logfile2 = "/log/access.log.1"
 
 # This is the path to the nginx conf files
+whitelist = "/srv/mmautoban/white.list"
 nginxfile = "/srv/.nginx/server_level/mmautoban.conf"
 nginxfilecarts = "/srv/.nginx/server_level/mmautobancarts.conf"
 nginxtor = "/srv/.nginx/server_level/mmautobantor.conf"
@@ -32,9 +33,7 @@ nginxcustom = "/srv/.nginx/server_level/mmautobancustom.conf"
 
 # MageMojo Autoban absolute path MUST BE A TRAILING /
 mmpath = "/srv/mmautoban/"
-whitelist = "/srv/mmautoban/white.list"
 #mmpath = "/srv/mmautoban/test/" #testingonly
-#whitelist = "/srv/mmautoban/test/white.list"
 
 # Check if files above exist. If they don't, create them.
 if str(path.exists(nginxfile)) == "False":
@@ -133,24 +132,9 @@ def wlist(whitelist,nginxfile):
             except socket.error:
                 print(RED + line + " is not a valid IP in white.list" + NC) # Not legal
 
-# Checks whitelist to see if IP is in it
-def inwlist(line,whitelist):
-    with open(whitelist) as wfile:
-        try:
-            socket.inet_aton(line)
-
-            if line in wfile.read():
-                print("found in white.list")
-                return True
-            else:
-                return False
-
-        except socket.error:
-            print(RED + line + " is not a valid IP?" + NC) # Not legal
-            return False
-
 # Bans an IP
 def doban(line,file):
+    whitelist = "/srv/mmautoban/white.list"
     global reload
     with open(file) as nfile:
 
@@ -163,10 +147,16 @@ def doban(line,file):
             if linetest in nfile.read():
                 print(n + " " + line + " already added to blocks or in white.list")
             else:
-                ban = "echo 'deny " + line + ";' >> " + file
-                os.system(ban)
-                print(n + PINK + " " + line + RED + " BLOCKED" + NC)
-                reload = 1
+                with open(whitelist) as wfile:
+                    if line in wfile.read():
+                        print(n + PINK + " " + line + NC + " not blocked cause in white.list" + NC)
+                    else:
+                        #print(whitelist)  #DEBUG
+                        #print(line)  #DEBUG
+                        ban = "echo 'deny " + line + ";' >> " + file
+                        os.system(ban)
+                        print(n + PINK + " " + line + RED + " BLOCKED" + NC)
+                        reload = 1
 
         except socket.error:
             print(RED + line + " is not a valid IP?" + NC) # Not legal
@@ -295,12 +285,12 @@ if args.carding >= 1:
                     # ban it
                     print(n + " " + PINK + line + NC + " Logging for no static or reload")
                     if savecounts(line) == 1:
-                        doban(line,ngixfile)
+                        doban(line,nginxfile)
                 else:
                     # Check excessive hits to addcart URL in general /checkout/cart/add/uenc/
                     hits = os.popen("grep " + line + " " + logfile + " | grep 'POST /checkout/cart/add/uenc/' | wc -l").read().replace("\n", "")
                     hits = int(hits)
-                    if hits > 100:
+                    if hits > 1000:
                         #ban it
                         if str(66.249) in line:
                             print(n + RED + " Can't block for cartadd " + PINK + LINE + RED + ". Google Bot." + NC)
@@ -333,18 +323,16 @@ if args.carding >= 1:
                     doban(line,nginxfile)
 
                 # Get cart mask id & ban it too!
-                cartid = os.popen("grep " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq").read().replace("\n", "")
+                cartid = os.popen("grep -m1 " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq").read().replace("\n", "")
                 print(n + " Logging cart " + PURPLE + cartid + NC)
                 if len(str(cartid)) == 32:
-                    if inwlist(line,whitelist) == False:
-                        if savecounts(cartid) == 1:
-                            dobancart(cartid)
-                    else:
-                        print(n + " Cart used by white-listed IP. Rejecting.")
+                    if savecounts(cartid) == 1:
+                        dobancart(cartid)
                 else:
                     #print(len(cartid))
                     #errorcheck = "cp /srv/mmautoban/tmp/api.found.tmp /srv/mmautoban/tmp/foundapi.error"
                     #os.system(errorcheck)
+                    #print("grep " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq")
                     print(n + RED + " Can't get cart from string. It is an unexpected result: " + PURPLE + str(cartid) + NC)
 
     ################# CA GET STATS ###################
@@ -489,8 +477,7 @@ if args.custompath >= 1:
 
                 if hits >= limit:
                     print(n + " " + PURPLE + " Ban Check:" + str(line) + " for " + str(hits) + " hit(s)" + NC)
-                    if not inwlist(line,whitelist):
-                        doban(line,nginxcustom)
+                    doban(line,nginxcustom)
                 else:
                     print(n + " " + GREEN + " Logging " + str(line) + " for " + str(hits) + " hit(s)" + NC)
 
