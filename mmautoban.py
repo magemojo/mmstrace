@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
-# v1.8
+# v1.9
 # Auto-add IPs related to carding attacks / TOR / custom paths
 # Cron should be set to same time as <time> variable for carding (default is 1 minute)
 
@@ -26,10 +26,10 @@ nginxfile = "/srv/.nginx/server_level/mmautoban.conf"
 nginxfilecarts = "/srv/.nginx/server_level/mmautobancarts.conf"
 nginxtor = "/srv/.nginx/server_level/mmautobantor.conf"
 nginxcustom = "/srv/.nginx/server_level/mmautobancustom.conf"
-#nginxfile = "/srv/mmautoban/test/mmautoban.conf" #testingonly
-#nginxfilecarts = "/srv/mmautoban/test/mmautobancarts.conf" #testingonly
-#nginxtor = "/srv/mmautoban/test/mmautobantor.conf" #testingonly
-#nginxcustom = "/srv/mmautoban/test/mmautobancustom.conf" #testingonly
+#nginxfile = "/srv/mmautoban/new/mmautoban.conf" #testingonly
+#nginxfilecarts = "/srv/mmautoban/new/mmautobancarts.conf" #testingonly
+#nginxtor = "/srv/mmautoban/new/mmautobantor.conf" #testingonly
+#nginxcustom = "/srv/mmautoban/new/mmautobancustom.conf" #testingonly
 
 # MageMojo Autoban absolute path MUST BE A TRAILING /
 mmpath = "/srv/mmautoban/"
@@ -61,7 +61,7 @@ if str(path.exists(mmpath + "tmp")) == "False":
 time = 1
 
 # How many minutes ago should we check for attacks before unbanning? (for carding option ONLY)
-utime = 15
+utime = 30
 
 # How many attacks should be considered "an active attack" in utime above (for carding option ONLY)
 activelimit = 10
@@ -245,11 +245,6 @@ if args.carding >= 1:
 
     ########## CA CHECK LOGS FOR ATTACKERS ##########
 
-    # Check logs for IPs with cart adds
-    checkcart = "sed -rne '/" + f + "/,/" + n + "/ p' " + logfile + " | grep /checkout/cart/add/uenc/ | grep product | grep POST > " + mmpath + "tmp/cart.found.tmp"
-    #checkcart = "cat " + logfile + " | grep /checkout/cart/add/uenc/ | grep product | grep POST > " + mmpath + "tmp/cart.found.tmp"
-    os.system(checkcart)
-
     # Check logs for payment API with 400 response
     checkapi = "sed -rne '/" + f + "/,/" + n + "/ p' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
     #checkapi = "cat " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
@@ -257,49 +252,6 @@ if args.carding >= 1:
 
 
     ########## CA PROCESS FINDINGS AND BLOCK IF DETERMINED FAKE ##########
-
-    # Check if anything is found this go for cart adds
-    filesize = os.path.getsize(mmpath + "tmp/cart.found.tmp")
-    if filesize == 0:
-        print(n + GREEN + " No cart adds found" + NC)
-    else:
-        # GET IPs
-        getips = "awk {'print $1'} " + mmpath + "tmp/cart.found.tmp | sort | uniq | sort -n  > " + mmpath + "tmp/cart.ips.tmp"
-        os.system(getips)
-
-        # Loop through found IPs that added to cart
-        with open(mmpath + "tmp/cart.ips.tmp") as f:
-            contents = f.readlines()
-            for line in reversed(contents):
-                line = line.replace("\n", "")
-
-                # Check logs for previous static file access or customer load section
-                checkstatic = "grep " + line + " " + logfile + " | grep static > " + mmpath + "tmp/static.found.tmp"
-                checkload = "grep " + line + " " + logfile + " | grep customer/section/load >> " + mmpath + "tmp/static.found.tmp"
-                os.system(checkstatic)
-                os.system(checkload)
-                sfilesize = os.path.getsize(mmpath + "tmp/static.found.tmp")
-
-                # If there has been no access to static files then block IP, otherwise check for excessive hits to cart
-                if sfilesize == 0:
-                    # ban it
-                    print(n + " " + PINK + line + NC + " Logging for no static or reload")
-                    if savecounts(line) == 1:
-                        doban(line,nginxfile)
-                else:
-                    # Check excessive hits to addcart URL in general /checkout/cart/add/uenc/
-                    hits = os.popen("grep " + line + " " + logfile + " | grep 'POST /checkout/cart/add/uenc/' | wc -l").read().replace("\n", "")
-                    hits = int(hits)
-                    if hits > 1000:
-                        #ban it
-                        if str(66.249) in line:
-                            print(n + RED + " Can't block for cartadd " + PINK + LINE + RED + ". Google Bot." + NC)
-                        else:
-                            print(n + " " + PINK + line + NC + " Logging for addcart count " + str(hits))
-                            if savecounts(line) == 1:
-                                doban(line,nginxfile)
-                    else:
-                        print(n + " " + PINK + line + GREEN + " Addcart appears legit" + NC)
 
 
     # Check if anything is found this go for API attacks
@@ -317,23 +269,31 @@ if args.carding >= 1:
             for line in reversed(contents):
                 line = line.replace("\n", "")
 
-                # ban  IP
-                print(n + " " + PINK + line + NC + " Logging for 400 paymentAPI return")
-                if savecounts(line) == 1:
+                # Check if static files have been loaded by this IP. If not, it must be a bot.
+                checkstatic = os.popen("grep " + line + " " + logfile + " | grep static | wc -l").read().replace("\n", "")
+                checkstatic2 = os.popen("grep " + line + " " + logfile2 + " | grep static | wc -l").read().replace("\n", "")
+                humancheck = int(checkstatic) + int(checkstatic2)
+                if humancheck == 0:
+                    # ban it
+                    print(n + " " + PINK + line + NC + " Banning for no staticfile access: not human: " + str(checkstatic) + "+" + str(checkstatic2) + "=" + str(humancheck))
                     doban(line,nginxfile)
 
-                # Get cart mask id & ban it too!
-                cartid = os.popen("grep -m1 " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq").read().replace("\n", "")
-                print(n + " Logging cart " + PURPLE + cartid + NC)
-                if len(str(cartid)) == 32:
-                    if savecounts(cartid) == 1:
-                        dobancart(cartid)
+                    # Get cart mask id & ban it too if it has used more than max allowed!
+                    cartid = os.popen("grep -m1 " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq").read().replace("\n", "")
+                    if len(str(cartid)) == 32:
+                        if savecounts(cartid) == 1:
+                            dobancart(cartid)
+                    else:
+                        #print(len(cartid))
+                        #errorcheck = "cp /srv/mmautoban/tmp/api.found.tmp /srv/mmautoban/tmp/foundapi.error"
+                        #os.system(errorcheck)
+                        #print("grep " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq")
+                        print(n + RED + " Can't get cart from string. It is an unexpected result: " + PURPLE + str(cartid) + NC)
                 else:
-                    #print(len(cartid))
-                    #errorcheck = "cp /srv/mmautoban/tmp/api.found.tmp /srv/mmautoban/tmp/foundapi.error"
-                    #os.system(errorcheck)
-                    #print("grep " + line + " " + mmpath + "tmp/api.found.tmp | grep -o -P '(?<=guest-carts/).*(?=/payment-information)' | uniq")
-                    print(n + RED + " Can't get cart from string. It is an unexpected result: " + PURPLE + str(cartid) + NC)
+                    # otherwise log the IP if there WAS static file access or ban if it was over the limit
+                    print(n + " " + PINK + line + NC + " Logging for 400 paymentAPI return")
+                    if savecounts(line) == 1:
+                        doban(line,nginxfile)
 
     ################# CA GET STATS ###################
 
