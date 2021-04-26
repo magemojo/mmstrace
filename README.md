@@ -43,8 +43,8 @@ For TOR exit node blocking: Set cron to run once a day to check for updates: /us
 
 Option: --carding <NUM>
 For carding attacks to payment-information API URL: 
-<NUM> is the number of times an IP or cart can return a 400 before being banned. 
-1 is very aggressive and should be used only when under active attack by several different ranges of IPs. This is because a legit customer can also receive a 400 error when a card is denied, or they enter the wrong zipcode.  
+<NUM> is the number of times an IP or cart can return a 400 (declined) from the payment api before being banned. 
+1 is very aggressive and should be used only when under active attack by several different ranges of IPs. This is because a legit customer can also receive a 400 error when a card is denied, or they enter the wrong zipcode. Immune to this setting, an IP that returns a 400 from the payment api and has not accessed any static files (pub/static) will be automatically banned. 
 Set cron every 1min example: /usr/bin/python /srv/mmautoban/mmautoban.py --carding 3 >> /srv/mmautoban/mmautoban.log
 Logs/stats will be in /srv/mmautoban/mmautoban.log
 
