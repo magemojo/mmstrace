@@ -272,10 +272,12 @@ if args.carding >= 1:
                 # Check if static files have been loaded by this IP. If not, it must be a bot.
                 checkstatic = os.popen("grep " + line + " " + logfile + " | grep static | wc -l").read().replace("\n", "")
                 checkstatic2 = os.popen("grep " + line + " " + logfile2 + " | grep static | wc -l").read().replace("\n", "")
-                humancheck = int(checkstatic) + int(checkstatic2)
+                checkcust = os.popen("grep " + line + " " + logfile + " | grep customer/section | wc -l").read().replace("\n", "")
+                checkcust2 = os.popen("grep " + line + " " + logfile2 + " | grep customer/section | wc -l").read().replace("\n", "")
+                humancheck = int(checkstatic) + int(checkstatic2) + int(checkcust) + int(checkcust2)
                 if humancheck == 0:
                     # ban it
-                    print(n + " " + PINK + line + NC + " Banning for no staticfile access: not human: " + str(checkstatic) + "+" + str(checkstatic2) + "=" + str(humancheck))
+                    print(n + " " + PINK + line + NC + " Banning for no staticfile or customer/section access: not human: " + str(checkstatic) + "+" + str(checkstatic2) + "+" + str(checkcust) + "+" + str(checkcust2) + "=" + str(humancheck))
                     doban(line,nginxfile)
 
                     # Get cart mask id & ban it too if it has used more than max allowed!
@@ -291,7 +293,7 @@ if args.carding >= 1:
                         print(n + RED + " Can't get cart from string. It is an unexpected result: " + PURPLE + str(cartid) + NC)
                 else:
                     # otherwise log the IP if there WAS static file access or ban if it was over the limit
-                    print(n + " " + PINK + line + NC + " Logging for 400 paymentAPI return")
+                    print(n + " " + PINK + line + NC + " Logging for 400 paymentAPI return: " + str(checkstatic) + "+" + str(checkstatic2) + "+" + str(checkcust) + "+" + str(checkcust2) + "=" + str(humancheck))
                     if savecounts(line) == 1:
                         doban(line,nginxfile)
 
