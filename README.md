@@ -76,8 +76,24 @@ Latest Copy of Magento 1 for our customers that still want it installed.
 
 # fire-in-the-hole.sh
 
+Nemanja Djuric
+
 Script gather abusive list from http://iplists.firehol.org/?ipset=firehol_abusers_30d RBL convert to nginx deny format and saves within /srv/.nginx/server_level/block-abusers.conf filename. RBL updates few times a day so enough to create cron task running on every 6 hours.
 
 An ipset made from blocklists that track abusers in the last 30 days. (includes: cleantalk_new_30d cleantalk_updated_30d php_commenters_30d php_dictionary_30d php_harvesters_30d php_spammers_30d stopforumspam sblam).
 
 Each time the IP list is changed, modified, or updated we keep track of its size (both number of entries and number of unique IPs matched). Using this information we can detect what the list maintainers do, get an idea of the list trend and its maintainers habbits.
+
+# hop.py ( HOUSE OF PAIN )
+
+Jackie Angus
+
+Pull Attack IPs from Data Warehouse for a specific instance
+
+Usage: python3 hop.py --uuid <UUID>
+
+Curls banlist for specific uuid from House Of Pain API
+Checks file is not empty/exists
+Converts list to nginx deny format in /srv/.nginx/server_level/<UUID>.conf
+Updates nginx /usr/share/stratus/cli nginx.update
+Rolls back if error returned from nginx.update
