@@ -90,7 +90,9 @@ Jackie Angus
 
 Pull Attack IPs from Data Warehouse for a specific instance
 
-Usage: python3 hop.py --uuid <UUID>
+Cron Usage: python3 /srv/.nginx/hop.py --uuid <UUID> >> /srv/ban.log
+5,25,45 * * * *
+At minute 5, 25, and 45.
 
 Curls banlist for specific uuid from House Of Pain API
 Checks file is not empty/exists

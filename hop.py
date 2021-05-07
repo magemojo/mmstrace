@@ -31,13 +31,13 @@ if args.uuid:
     getlist = "cd /srv/.nginx/;curl " + url + " -o \'#1.list\'"
     os.system(getlist)
 
-    #  TOR Loop through IPs in the list
+    # Loop through IPs in the list
     filesize = os.path.getsize("/srv/.nginx/" + uuid + ".list")
     if filesize == 0:
         print(RED + " Something is wrong. Source list not found or empty" + NC)
     else:
         do = "awk \'{print \"deny \"$0\";\"}\' /srv/.nginx/" + uuid + ".list > /srv/.nginx/server_level/" + uuid + ".conf"
-        #os.system(do)
+        os.system(do)
         rm = "rm /srv/.nginx/" + uuid + ".list"
         os.system(rm)
         doreload = "/usr/share/stratus/cli nginx.update"
