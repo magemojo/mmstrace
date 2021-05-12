@@ -36,7 +36,7 @@ if args.uuid:
     if filesize == 0:
         print(RED + " Something is wrong. Source list not found or empty" + NC)
     else:
-        do = "awk \'{print \"deny \"$0\";\"}\' /srv/.nginx/" + uuid + ".list > /srv/.nginx/server_level/" + uuid + ".conf"
+        do = "awk \'{print \"deny \"$0\";\"}\' /srv/.nginx/" + uuid + ".list | uniq > /srv/.nginx/server_level/" + uuid + ".conf"
         os.system(do)
         rm = "rm /srv/.nginx/" + uuid + ".list"
         os.system(rm)
