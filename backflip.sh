@@ -1,6 +1,6 @@
 #!/bin/bash
 #######################################
-#     MageMojo Backup Script v4.0     #
+#     MageMojo Backup Script v4.1     #
 #######################################
 #       Multi-use Backup Utlity!      #
 #                                     #
@@ -526,7 +526,7 @@ cd "/srv"
 ##      w/ love Bojan       ##
 ##############################
 
-/bin/tar --exclude=$WEB/media --exclude=$WEB/pub -cvzf /srv/backups/$YOLO/files/$WEB.tar.gz $WEB/
+/bin/tar --exclude=$WEB/media -cvzf /srv/backups/$YOLO/files/$WEB.tar.gz $WEB/
 cd "/srv/backups"
 tar -czvf $YOLO.tar.gz $YOLO
 rm -f "/srv/streetcred.log"
@@ -637,7 +637,7 @@ cd "/srv"
 ##      w/ love Bojan       ##
 ##############################
 
-/bin/tar --exclude=$WEB/media --exclude=$WEB/pub -cvzf /srv/backups/$YOLO/files/$WEB.tar.gz $WEB/
+/bin/tar --exclude=$WEB/media -cvzf /srv/backups/$YOLO/files/$WEB.tar.gz $WEB/
 cd "/srv/backups"
 tar -czvf $YOLO.tar.gz $YOLO
 rm -f "/srv/streetcred.log"
