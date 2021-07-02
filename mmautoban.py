@@ -247,7 +247,8 @@ if args.carding >= 1:
 
     # Check logs for payment API with 400 response
     #checkapi = "sed -rne '/" + f + "/,/" + n + "/ p' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
-    checkapi = "awk -v d1=\"$(date --date=\"-1 min\" \"+%d/%b/%Y:%H:%M\")\" -v d2=\"$(date \"+%d/%b/%Y:%H:%M\")\" '$0 > d1 && $0 < d2 || $0 ~ d2' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
+    #checkapi = "awk -v d1=\"$(date --date=\"-1 min\" \"+%d/%b/%Y:%H:%M\")\" -v d2=\"$(date \"+%d/%b/%Y:%H:%M\")\" '$0 > d1 && $0 < d2 || $0 ~ d2' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
+    checkapi = "awk -v d1=\"$(date --date=\"-1 min\" \"+%d/%b/%Y:%T\")\" -v d2=\"$(date \"+%d/%b/%Y:%T\")\" '{gsub(/^[\[\t]+/, \"\", $3);}; $3 > d1 && $3 < d2 || $3 ~ d2' " + logfile + " | grep V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
     #checkapi = "cat " + logfile + " | grep rest/default/V1/guest-carts | grep payment-information | grep POST | grep ' 400 ' > " + mmpath + "tmp/api.found.tmp"
     os.system(checkapi)
 
