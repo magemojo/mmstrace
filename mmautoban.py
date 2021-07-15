@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
-# v1.9
+# v1.10
 # Auto-add IPs related to carding attacks / TOR / custom paths
 # Cron should be set to same time as <time> variable for carding (default is 1 minute)
 
