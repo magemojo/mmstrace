@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # Abusive IP Grabber from MageMojo HOP
+# Version 1.1
 
 ########## GLOBAL NEEDED THINGS | DO NOT CHANGE ##########
 import os
