@@ -10,6 +10,7 @@ import ipaddress
 import socket
 import argparse
 import subprocess
+import re
 wlist=[] #declare list
 
 # Some Pretty Colors for logs
@@ -70,44 +71,58 @@ if args.uuid:
     if filesize == 0:
         print(RED + " Something is wrong. Source list not found or empty" + NC)
     else:
-        # Build awk to add deny nginx format
-        do = "awk \'{print \"deny \"$0\";\"}\' /tmp/" + uuid + ".list"
+        # Test if file was a timeout error
+        pattern = re.compile("[A-Za-z]+")
+        badfile = "false"
 
-        # Make sure to ignore whitelisted IPs
-        for ip in wlist:
-            try:
-                # Check if real IP
-                if '/24' in ip:
-                    ipaddress.ip_network(ip)
-                else:
-                    socket.inet_aton(ip)
-                do = do + " | grep -v " + str(ip)
-            except socket.error:
-                print(RED + ip + " is not a valid IP in white.list" + NC) # Not legal
+        # if letters found in file
+        for line in open("/tmp/" + uuid + ".list"):
+            if "error" in line:
+                print("Can't use file. It has an error: " + line)
+                badfile = "true"
+            elif "cloudfront" in line:
+                print("Can't use file. It has an error: " + line)
+                badfile = "true"
+
+        if badfile == "false":
+            # Build awk to add deny nginx format
+            do = "awk \'{print \"deny \"$0\";\"}\' /tmp/" + uuid + ".list"
+
+            # Make sure to ignore whitelisted IPs
+            for ip in wlist:
+                try:
+                    # Check if real IP
+                    if '/24' in ip:
+                        ipaddress.ip_network(ip)
+                    else:
+                        socket.inet_aton(ip)
+                    do = do + " | grep -v " + str(ip)
+                except socket.error:
+                    print(RED + ip + " is not a valid IP in white.list" + NC) # Not legal
 
 
-        # Tell it where to put them
-        do = do + " | uniq > /srv/.nginx/server_level/" + uuid + ".conf"
+            # Tell it where to put them
+            do = do + " | uniq > /srv/.nginx/server_level/" + uuid + ".conf"
 
-        # Run it
-        os.system(do)
-        #print(do)  ## debug
+            # Run it
+            os.system(do)
+            #print(do)  ## debug
 
-        # Clean up tmp file
-        rm = "rm /tmp/" + uuid + ".list"
-        os.system(rm)
+            # Reload nginx to apply changes
+            doreload = "/usr/share/stratus/cli nginx.update"
+            nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
 
-        # Reload nginx to apply changes
-        doreload = "/usr/share/stratus/cli nginx.update"
-        nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
+            if "returncode=0" in str(nginxupdate):
+                print(nginxupdate)
+                print(GREEN + " List good. Reloaded nginx config" + NC)
+            else:
+                print(nginxupdate)
+                mv = "mv /srv/.nginx/server_level/" + uuid + ".conf /srv/.nginx/server_level/" + uuid + ".failed"
+                print(RED + " Nginx failed to reload: reverted" + NC)
+                nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
 
-        #if "returncode=0" in str(nginxupdate):
-        #    print(nginxupdate)
-        #    print(GREEN + " List good. Reloaded nginx config" + NC)
-        #else:
-        #    print(nginxupdate)
-        #    mv = "mv /srv/.nginx/server_level/" + uuid + ".conf /srv/.nginx/server_level/" + uuid + ".failed"
-        #    print(RED + " Nginx failed to reload: reverted" + NC)
-        #    nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
+            # Clean up tmp file
+            rm = "rm /tmp/" + uuid + ".list"
+            os.system(rm)
 else:
     print(RED + " UUID was not specified. Can not continue" + NC)
