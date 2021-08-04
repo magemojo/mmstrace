@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-# Abusive IP Grabber from MageMojo HOP 1.0
+# Abusive IP Grabber from MageMojo HOP 1.1
 
 ########## GLOBAL NEEDED THINGS | DO NOT CHANGE ##########
 import os
+import sys
 import os.path
 from os import path
 import ipaddress
@@ -38,7 +39,7 @@ else:
                #runit = "python3 ./hopupdate.py"
                runit = subprocess.Popen("python3 /srv/.nginx/hopupdate.py")
                os.system(runit)
-               os._exit
+               sys.exit()
 # Get UUID
 parser = argparse.ArgumentParser()
 parser.add_argument('-u','--uuid', action='store', dest='uuid', type=str, help="uuid of the instance")
