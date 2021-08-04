@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Abusive IP Grabber from MageMojo HOP 1.1
+# Abusive IP Grabber from MageMojo HOP 1.0
 
 ########## GLOBAL NEEDED THINGS | DO NOT CHANGE ##########
 import os
@@ -21,6 +21,24 @@ if str(path.exists("/srv/.nginx/white.list")) == "False":
     touchit="touch /srv/.nginx/white.list"
     os.system(touchit)
 
+# Check if update needed
+gitcopy = "wget -q -O /srv/.nginx/hop.check https://raw.githubusercontent.com/magemojo/mmstrace/master/hop.py"
+os.system(gitcopy)
+hopnow = open("/srv/.nginx/hop.py", "r").readlines()[1]
+hopnew = open("/srv/.nginx/hop.check", "r").readlines()[1]
+
+if hopnew == hopnow:
+     print("Update not needed")
+else:
+     if "MageMojo" in hopnew:
+          if "MageMojo" in hopnow:
+               print("Update Needed!")
+               getit = "wget -q https://raw.githubusercontent.com/magemojo/mmstrace/master/hopupdate.py"
+               os.system(getit)
+               #runit = "python3 ./hopupdate.py"
+               runit = subprocess.Popen("python3 /srv/.nginx/hopupdate.py")
+               os.system(runit)
+               os._exit
 # Get UUID
 parser = argparse.ArgumentParser()
 parser.add_argument('-u','--uuid', action='store', dest='uuid', type=str, help="uuid of the instance")
@@ -82,13 +100,13 @@ if args.uuid:
         doreload = "/usr/share/stratus/cli nginx.update"
         nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
 
-        if "returncode=0" in str(nginxupdate):
-            print(nginxupdate)
-            print(GREEN + " List good. Reloaded nginx config" + NC)
-        else:
-            print(nginxupdate)
-            mv = "mv /srv/.nginx/server_level/" + uuid + ".conf /srv/.nginx/server_level/" + uuid + ".failed"
-            print(RED + " Nginx failed to reload: reverted" + NC)
-            nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
+        #if "returncode=0" in str(nginxupdate):
+        #    print(nginxupdate)
+        #    print(GREEN + " List good. Reloaded nginx config" + NC)
+        #else:
+        #    print(nginxupdate)
+        #    mv = "mv /srv/.nginx/server_level/" + uuid + ".conf /srv/.nginx/server_level/" + uuid + ".failed"
+        #    print(RED + " Nginx failed to reload: reverted" + NC)
+        #    nginxupdate = subprocess.run(["/usr/share/stratus/cli","nginx.update"], check=True)
 else:
     print(RED + " UUID was not specified. Can not continue" + NC)
