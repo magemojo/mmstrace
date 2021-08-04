@@ -87,7 +87,9 @@ Each time the IP list is changed, modified, or updated we keep track of its size
 # hop.py ( HOUSE OF PAIN )
 
 Jackie Angus
-
+  
+8/4/2021 Version 1.1 Updates self / Added error checks for CF errors
+  
 Pull Attack IPs from Data Warehouse for a specific instance
 
   Cron Usage: python3 /srv/.nginx/hop.py --uuid INSERTUUIDHERE >> /srv/ban.log
