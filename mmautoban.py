@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # MageMojo AutoBan
-# v1.10
+# v1.11
 # Auto-add IPs related to carding attacks / TOR / custom paths
 # Cron should be set to same time as <time> variable for carding (default is 1 minute)
 
@@ -26,6 +26,7 @@ nginxfile = "/srv/.nginx/server_level/mmautoban.conf"
 nginxfilecarts = "/srv/.nginx/server_level/mmautobancarts.conf"
 nginxtor = "/srv/.nginx/server_level/mmautobantor.conf"
 nginxcustom = "/srv/.nginx/server_level/mmautobancustom.conf"
+nginxwaf = "/srv/.nginx/server_level/mmautobanwaf.conf"
 #nginxfile = "/srv/mmautoban/new/mmautoban.conf" #testingonly
 #nginxfilecarts = "/srv/mmautoban/new/mmautobancarts.conf" #testingonly
 #nginxtor = "/srv/mmautoban/new/mmautobantor.conf" #testingonly
@@ -50,6 +51,9 @@ if str(path.exists(whitelist)) == "False":
     os.system(touchit)
 if str(path.exists(nginxcustom)) == "False":
     touchit="touch " + nginxcustom
+    os.system(touchit)
+if str(path.exists(nginxwaf)) == "False":
+    touchit="touch " + nginxwaf
     os.system(touchit)
 if str(path.exists(mmpath + "tmp")) == "False":
     makeit="mkdir " + mmpath + "tmp"
@@ -78,6 +82,9 @@ GREEN='\033[0;32m'
 # Update location for TOR exit node list
 torurl = "https://check.torproject.org/torbulkexitlist"
 torfile = "torbulkexitlist"
+
+# Update location for WAF rules
+wafrules = "https://magemojo.com/mojo_scripts/waf-banlist.php"
 
 
 ########## GLOBAL GET TIME VARS ##########
@@ -112,6 +119,8 @@ parser.add_argument('-l', action='store', dest='limit', type=int,
     help="<limit> subvar for --custompath")
 parser.add_argument('-r', action='store', dest='refresh', type=int,
     help="<refresh> subvar for --custompath")
+parser.add_argument('-w', '--waf', action='store_true',
+    help="blocks IPs from WAF")
 args = parser.parse_args()
 
 
@@ -443,6 +452,35 @@ if args.custompath >= 1:
                 else:
                     print(n + " " + GREEN + " Logging " + str(line) + " for " + str(hits) + " hit(s)" + NC)
 
+
+
+########## --waf updates from WAF rules on dev ##################
+if args.waf:
+    getlist = "cd " + mmpath + " && curl -O " + wafrules
+    os.system(getlist)
+
+    #  get file and copy it
+    filesize = os.path.getsize(mmpath + "waf-banlist.php")
+    if filesize == 0:
+        print(n + RED + " Something is wrong. WAF source list not found or empty" + NC)
+    else:
+        useit = "mv " + mmpath + "waf-banlist.php " + nginxwaf
+        os.system(useit)
+        print(n + GREEN + " Good to go! file copied" + NC)
+
+        with open(whitelist) as wfile:
+            #check whitelist and add IPs to conf as allowed
+            contents = wfile.readlines()
+            for line in contents:
+                line = line.replace("\n", "")
+                try:
+                    socket.inet_aton(line)
+                    wl = "sed -i '/" + line + ";$/d' " + nginxwaf
+                    os.system(wl)
+                    print(n + PINK + " " + line + GREEN + " WHITE-LISTED" + NC)
+                except socket.error:
+                    print(RED + line + " is not a valid IP in white.list" + NC) # Not legal
+            reload = 1;
 
 ######### GLOBAL RELOAD NGINX NICELY IF WE ADDED BLOCKS ##########
 if reload == 1:
