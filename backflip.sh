@@ -1,16 +1,16 @@
 #!/bin/bash
-#######################################
-#     MageMojo Backup Script v4.1     #
-#######################################
-#       Multi-use Backup Utlity!      #
-#                                     #
-#   FOR USE ON STRATUS SYSTEMS ONLY   #
-#                                     #
-#######################################
-# Usage: ./backflip.sh                #
-#######################################
-# Report bugs: justin@magemojo.com    #
-#######################################
+############################################
+#        Stratus Backup Script v4.2        #
+############################################
+#         Multi-use Backup Utlity!         #
+#                                          #
+#     FOR USE ON STRATUS SYSTEMS ONLY      #
+#                                          #
+############################################
+# Usage: ./backflip.sh                     #
+############################################
+# Report bugs: justin@webscalenetworks.com #
+############################################
 clear
 echo "======================================="
 echo "======================================="
@@ -145,7 +145,7 @@ echo ""
 ##      w/ love Jackie     ##
 #############################
 
-nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql 
+nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --no-tablespaces --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql 
 
 cd "/srv"
 /bin/tar -cvzf /srv/backups/$YOLO/files/$WEB.tar.gz $WEB/
@@ -269,7 +269,7 @@ echo ""
 ##      w/ love Jackie     ##
 #############################
 
-nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql
+nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --no-tablespaces --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql
 
 mv $DAB.sql.gz $YOLO.sql.gz
 cd "/srv"
@@ -517,7 +517,7 @@ echo ""
 ##      w/ love Jackie     ##
 #############################
 
-nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql 
+nice -n 15 /usr/bin/mysqldump -h mysql -u $STUSR -p$STPAS --single-transaction --no-tablespaces --opt --skip-lock-tables --max_allowed_packet=512M $DAB > $DAB.sql && sed -i 's/DEFINER=[^*]*\*/\*/g' $DAB.sql && gzip $DAB.sql 
 
 cd "/srv"
 
