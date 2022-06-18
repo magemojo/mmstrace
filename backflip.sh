@@ -2,7 +2,7 @@
 ############################################
 #        Stratus Backup Script v4.2        #
 ############################################
-#         Multi-use Backup Utlity!         #
+#        Multi-use Backup Utility!         #
 #                                          #
 #     FOR USE ON STRATUS SYSTEMS ONLY      #
 #                                          #
