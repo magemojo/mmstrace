@@ -17,8 +17,6 @@ Justin Waggoner
 
 Backflip v4.2 is now available. Backflip is a multi-use backup utility. It automatically extracts Stratus details such as the MySQL username, MySQL password, and MySQL database name for a nice POC-friendly MySQL dump. The script will dump and package everything neatly and report to you the location of the generated backup. All you have to do is press a key, enter a doc root and Backflip will do the rest.
 
-3.3 additions: This version eliminates the need for Magento version checking and pulls MySQL data straight from Stratus courtesy of Ian, and features store-friendly nice MySQL dumps for almost zero POC hits.
-
 # dns.sh
 
 Steven Jackson
