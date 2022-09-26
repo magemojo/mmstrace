@@ -11,7 +11,7 @@ wget https://github.com/magemojo/mmstrace/raw/master/mmstrace.tar.gz;tar -xvzf m
 2/5/2020 Removed MHM section. Added query string usage & Redis activity. Added core_session and core_cache usage detection. 
 9/29/2019 changed slow query and path list to 10 instead of 5. Added top tables accessed and count.
 
-# blackflip.sh
+# backflip.sh
 
 Justin Waggoner
 
